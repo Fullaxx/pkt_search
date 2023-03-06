@@ -1,0 +1,44 @@
+{
+  "order": 0,
+  "index_patterns": [
+    "packets-*"
+  ],
+  "settings": {
+    "index": {
+      "lifecycle": {
+        "name": "packets-lifecycle-policy",
+        "rollover_alias": "packets"
+      }
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [],
+    "properties": {
+      "@timestamp": {
+        "type": "date"
+      },
+      "packetCaptureTime": {
+        "type": "date",
+        "format": "epoch_second"
+      },
+      "ethDst": {
+        "type": "keyword"
+      },
+      "ethSrc": {
+        "type": "keyword"
+      },
+      "vlanID": {
+        "type": "keyword"
+      },
+      "ipSrc": {
+        "type": "keyword"
+      },
+      "ipDst": {
+        "type": "keyword"
+      },
+      "ipProto": {
+        "type": "keyword"
+      }
+    }
+  }
+}
