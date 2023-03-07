@@ -9,6 +9,7 @@
 
 INDICES="packets"
 ELASTICSERVER="localhost"
+PASSWORDFILE="/data/passwords"
 JSONDIR="/elasticsearch/autoconfig/"
 
 # Before we fire off all of these configs, we need to give elasticsearch and kibana a chance
@@ -32,13 +33,13 @@ echo
 # If this is the first time the container has ever been started and this script run, we need to do some work...
 if ! [ -e "/.firstrun" ]; then
 	echo "Adding password to Elasticsearch/kibana to secure it"
-	echo "y" | /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto > /usr/share/elasticsearch/data/passwords
+	echo "y" | /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto >${PASSWORDFILE}
 	# Let's make sure folks can not read our password file...
-	chmod o-rwx /usr/share/elasticsearch/data/passwords
-	cp -fv /usr/share/elasticsearch/data/passwords /etc/elasticsearch/
-	ln -s /usr/share/elasticsearch/data/passwords /elasticsearch/autoconfig/
-	KIBANA_SYSTEM_PASSWORD="`cat /usr/share/elasticsearch/data/passwords | grep 'PASSWORD kibana_system' | awk '{print $4}'`"
-	ELASTIC_PASSWORD="`cat /usr/share/elasticsearch/data/passwords | grep 'PASSWORD elastic = ' | awk '{print $4}'`"
+	chmod o-rwx ${PASSWORDFILE}
+#	cp -fv ${PASSWORDFILE} /etc/elasticsearch/
+#	ln -s ${PASSWORDFILE} /elasticsearch/autoconfig/
+	KIBANA_SYSTEM_PASSWORD="`cat ${PASSWORDFILE} | grep 'PASSWORD kibana_system' | awk '{print $4}'`"
+	ELASTIC_PASSWORD="`cat ${PASSWORDFILE} | grep 'PASSWORD elastic = ' | awk '{print $4}'`"
 	echo "KIBANA_SYSTEM_PASSWORD was: ${KIBANA_SYSTEM_PASSWORD}"
 	rm -f /etc/kibana/kibana.keystore
 	/usr/share/kibana/bin/kibana-keystore create
@@ -56,8 +57,8 @@ if ! [ -e "/.firstrun" ]; then
 	supervisorctl restart kibana
 else
 	# Enumerate our passwords
-	KIBANA_SYSTEM_PASSWORD="`cat /usr/share/elasticsearch/data/passwords | grep 'PASSWORD kibana_system' | awk '{print $4}'`"
-	ELASTIC_PASSWORD="`cat /usr/share/elasticsearch/data/passwords | grep 'PASSWORD elastic = ' | awk '{print $4}'`"
+	KIBANA_SYSTEM_PASSWORD="`cat ${PASSWORDFILE} | grep 'PASSWORD kibana_system' | awk '{print $4}'`"
+	ELASTIC_PASSWORD="`cat ${PASSWORDFILE} | grep 'PASSWORD elastic = ' | awk '{print $4}'`"
 fi
 
 KIBANAHEALTH="`curl -sS -XGET ${ELASTICSERVER}:5601 2>&1`"

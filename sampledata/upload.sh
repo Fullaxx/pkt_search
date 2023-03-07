@@ -1,6 +1,8 @@
 #!/bin/bash
 # Upload ndjson file
 
+PASSWORDFILE="/data/passwords"
+
 if [ "$#" -ne "2" ]; then
   echo "$0: <INDEX> <FILE>"
   exit 1
@@ -8,7 +10,7 @@ fi
 
 if [ -z "${PASS}" ]; then
   echo "Set PASS in the environment!"
-  echo "Use /etc/elasticsearch/passwords to find the password for elastic"
+  echo "Use ${PASSWORDFILE} to find the password for elastic"
   exit 2
 fi
 
